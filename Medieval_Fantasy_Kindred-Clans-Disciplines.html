@@ -1,0 +1,722 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Clans & Disciplines · Medieval Fantasy</title>
+<link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;600;700&family=EB+Garamond:ital,wght@0,400;0,500;1,400&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --black:       #080608;
+    --deep:        #0e0810;
+    --surface:     #130d14;
+    --card-a:      #1a1020;
+    --card-b:      #201428;
+    --border:      #3a1a2a;
+    --blood:       #7a0000;
+    --crimson:     #a01020;
+    --rose:        #c83040;
+    --gold:        #c4943a;
+    --gold-light:  #e8c97a;
+    --gold-dim:    #8a6420;
+    --text:        #e8d8c8;
+    --text-dim:    #a08878;
+    --text-faint:  #604848;
+    --disc-tag:    #ff8870;
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    background: var(--black);
+    color: var(--text);
+    font-family: 'EB Garamond', Georgia, serif;
+    font-size: 15px;
+    line-height: 1.6;
+    min-height: 100vh;
+  }
+
+  /* ── BACKGROUND TEXTURE ── */
+  body::before {
+    content: '';
+    position: fixed;
+    inset: 0;
+    background:
+      radial-gradient(ellipse 80% 60% at 50% -10%, #3a001844 0%, transparent 70%),
+      radial-gradient(ellipse 40% 40% at 10% 80%, #1a000833 0%, transparent 60%),
+      radial-gradient(ellipse 30% 50% at 90% 50%, #0a001022 0%, transparent 60%);
+    pointer-events: none;
+    z-index: 0;
+  }
+
+  .wrap { position: relative; z-index: 1; max-width: 1200px; margin: 0 auto; padding: 0 24px 80px; }
+
+  /* ── HEADER ── */
+  header {
+    text-align: center;
+    padding: 60px 0 40px;
+    border-bottom: 1px solid var(--border);
+    margin-bottom: 40px;
+    position: relative;
+  }
+  header::after {
+    content: '';
+    position: absolute;
+    bottom: -1px; left: 50%; transform: translateX(-50%);
+    width: 200px; height: 1px;
+    background: linear-gradient(90deg, transparent, var(--gold), transparent);
+  }
+
+  .court-label {
+    font-family: 'Cinzel', serif;
+    font-size: 11px;
+    letter-spacing: 0.4em;
+    color: var(--gold-dim);
+    text-transform: uppercase;
+    margin-bottom: 16px;
+  }
+
+  h1 {
+    font-family: 'Cinzel', serif;
+    font-size: clamp(22px, 4vw, 38px);
+    font-weight: 700;
+    color: var(--gold-light);
+    letter-spacing: 0.06em;
+    line-height: 1.2;
+    text-shadow: 0 0 40px #c4943a44;
+  }
+
+  .header-sub {
+    margin-top: 12px;
+    font-style: italic;
+    color: var(--text-dim);
+    font-size: 14px;
+  }
+
+  .ornament { color: var(--gold-dim); margin: 0 12px; }
+
+  /* ── TABS ── */
+  .tabs {
+    display: flex;
+    gap: 2px;
+    margin-bottom: 32px;
+    border-bottom: 1px solid var(--border);
+  }
+
+  .tab {
+    font-family: 'Cinzel', serif;
+    font-size: 12px;
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+    padding: 12px 28px;
+    cursor: pointer;
+    color: var(--text-dim);
+    border: 1px solid transparent;
+    border-bottom: none;
+    background: transparent;
+    transition: all 0.2s;
+    position: relative;
+    bottom: -1px;
+  }
+
+  .tab:hover { color: var(--gold); }
+
+  .tab.active {
+    color: var(--gold-light);
+    background: var(--surface);
+    border-color: var(--border);
+    border-bottom-color: var(--surface);
+  }
+
+  /* ── PANELS ── */
+  .panel { display: none; }
+  .panel.active { display: block; }
+
+  /* ── CLAN TABLE ── */
+  .lore-box {
+    background: #1a0010;
+    border: 1px solid var(--border);
+    border-left: 3px solid var(--blood);
+    padding: 14px 20px;
+    margin-bottom: 28px;
+    font-style: italic;
+    color: var(--text-dim);
+    font-size: 14px;
+    line-height: 1.7;
+  }
+
+  .table-wrap { overflow-x: auto; }
+
+  table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 14px;
+  }
+
+  thead tr {
+    background: var(--blood);
+  }
+
+  thead th {
+    font-family: 'Cinzel', serif;
+    font-size: 11px;
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+    color: var(--text);
+    padding: 12px 14px;
+    text-align: left;
+    border-bottom: 2px solid var(--gold-dim);
+    white-space: nowrap;
+  }
+
+  tbody tr:nth-child(odd)  { background: var(--card-a); }
+  tbody tr:nth-child(even) { background: var(--card-b); }
+
+  tbody tr {
+    border-bottom: 1px solid var(--border);
+    transition: background 0.15s;
+  }
+  tbody tr:hover { background: #2a1535; }
+
+  td {
+    padding: 12px 14px;
+    vertical-align: top;
+    border-right: 1px solid var(--border);
+  }
+  td:last-child { border-right: none; }
+
+  .clan-name {
+    font-family: 'Cinzel', serif;
+    font-size: 13px;
+    color: var(--gold-light);
+    font-weight: 600;
+    white-space: nowrap;
+  }
+
+  .clan-nick {
+    font-style: italic;
+    color: var(--gold-dim);
+    font-size: 13px;
+    white-space: nowrap;
+  }
+
+  .disc-link {
+    display: inline-block;
+    background: #2a0820;
+    border: 1px solid var(--border);
+    color: var(--disc-tag);
+    padding: 2px 10px;
+    border-radius: 2px;
+    font-size: 12px;
+    cursor: pointer;
+    margin: 2px 0;
+    transition: all 0.15s;
+    font-family: 'EB Garamond', serif;
+    white-space: nowrap;
+  }
+  .disc-link:hover {
+    background: var(--blood);
+    border-color: var(--crimson);
+    color: var(--text);
+  }
+
+  .bane-text { color: #e06060; font-size: 13px; }
+  .comp-text { color: var(--text-dim); font-size: 13px; font-style: italic; }
+
+  /* ── DISCIPLINE LORE ── */
+  .disc-lore {
+    background: #1a0010;
+    border: 1px solid var(--border);
+    border-left: 3px solid var(--blood);
+    padding: 14px 20px;
+    margin-bottom: 28px;
+    font-style: italic;
+    color: var(--text-dim);
+    font-size: 14px;
+    line-height: 1.7;
+  }
+
+  /* ── DISCIPLINE BLOCKS ── */
+  .disc-block {
+    margin-bottom: 6px;
+    border: 1px solid var(--border);
+    border-radius: 2px;
+    overflow: hidden;
+  }
+
+  .disc-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 13px 20px;
+    background: linear-gradient(90deg, #2a0010, #1a0818);
+    cursor: pointer;
+    user-select: none;
+    border-bottom: 2px solid var(--gold-dim);
+    transition: background 0.15s;
+  }
+  .disc-header:hover { background: linear-gradient(90deg, #380018, #22102a); }
+
+  .disc-header-name {
+    font-family: 'Cinzel', serif;
+    font-size: 15px;
+    font-weight: 700;
+    color: var(--gold-light);
+    letter-spacing: 0.12em;
+  }
+
+  .disc-header-right {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+  }
+
+  .disc-count {
+    font-size: 12px;
+    color: var(--text-faint);
+    font-style: italic;
+  }
+
+  .disc-chevron {
+    color: var(--gold-dim);
+    font-size: 18px;
+    transition: transform 0.25s;
+    line-height: 1;
+  }
+  .disc-block.open .disc-chevron { transform: rotate(180deg); }
+
+  .disc-body {
+    display: none;
+    background: var(--surface);
+  }
+  .disc-block.open .disc-body { display: block; }
+
+  .power-col-headers {
+    display: grid;
+    grid-template-columns: 80px 1fr 2fr;
+    background: #1e0818;
+    border-bottom: 1px solid var(--gold-dim);
+  }
+
+  .power-col-header {
+    font-family: 'Cinzel', serif;
+    font-size: 10px;
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+    color: var(--gold-dim);
+    padding: 7px 14px;
+    border-right: 1px solid var(--border);
+  }
+  .power-col-header:last-child { border-right: none; }
+
+  .power-row {
+    display: grid;
+    grid-template-columns: 80px 1fr 2fr;
+    gap: 0;
+    border-bottom: 1px solid var(--border);
+    transition: background 0.1s;
+  }
+  .power-row:last-child { border-bottom: none; }
+  .power-row:nth-child(odd)  { background: #140c1a; }
+  .power-row:nth-child(even) { background: #100810; }
+  .power-row:hover { background: #1e1028; }
+
+  .power-level {
+    padding: 10px 0 10px 16px;
+    color: var(--gold);
+    font-family: 'Cinzel', serif;
+    font-size: 12px;
+    display: flex;
+    align-items: flex-start;
+    padding-top: 12px;
+    border-right: 1px solid var(--border);
+  }
+
+  .power-name {
+    padding: 10px 14px;
+    font-weight: 500;
+    color: var(--text);
+    font-size: 14px;
+    border-right: 1px solid var(--border);
+    display: flex;
+    align-items: flex-start;
+    padding-top: 12px;
+  }
+
+  .power-desc {
+    padding: 10px 16px 10px 14px;
+    color: var(--text-dim);
+    font-size: 13px;
+    font-style: italic;
+    line-height: 1.6;
+  }
+
+  /* ── SEARCH ── */
+  .search-wrap {
+    margin-bottom: 24px;
+    position: relative;
+  }
+
+  .search-input {
+    width: 100%;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 2px;
+    padding: 10px 16px 10px 40px;
+    color: var(--text);
+    font-family: 'EB Garamond', serif;
+    font-size: 15px;
+    outline: none;
+    transition: border-color 0.2s;
+  }
+  .search-input:focus { border-color: var(--gold-dim); }
+  .search-input::placeholder { color: var(--text-faint); font-style: italic; }
+
+  .search-icon {
+    position: absolute;
+    left: 13px; top: 50%; transform: translateY(-50%);
+    color: var(--text-faint);
+    font-size: 14px;
+    pointer-events: none;
+  }
+
+  /* ── FOOTER ── */
+  footer {
+    text-align: center;
+    margin-top: 60px;
+    padding-top: 24px;
+    border-top: 1px solid var(--border);
+    color: var(--text-faint);
+    font-size: 12px;
+    font-style: italic;
+    letter-spacing: 0.1em;
+  }
+
+  /* ── HIGHLIGHT ── */
+  @keyframes flashHighlight {
+    0%   { background: #4a1030; }
+    100% { background: inherit; }
+  }
+  .disc-block.highlighted > .disc-header {
+    animation: flashHighlight 1.2s ease-out;
+  }
+
+  /* ── RESPONSIVE ── */
+  @media (max-width: 700px) {
+    .power-row { grid-template-columns: 60px 1fr; }
+    .power-col-headers { grid-template-columns: 60px 1fr; }
+    .power-name { display: none; }
+    .power-col-header:nth-child(2) { display: none; }
+    .power-desc { border-left: none; }
+    thead th:nth-child(n+5) { display: none; }
+    td:nth-child(n+5) { display: none; }
+  }
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <header>
+    <div class="court-label">✦ &nbsp; Medieval Fantasy &nbsp; ✦</div>
+    <h1>Clans &amp; Disciplines</h1>
+    <div class="header-sub">
+      <span class="ornament">✦</span>
+      Reference guide for the bloodlines of Caine
+      <span class="ornament">✦</span>
+    </div>
+  </header>
+
+  <div class="tabs">
+    <button class="tab active" onclick="switchTab('clans', this)">Clans</button>
+    <button class="tab" onclick="switchTab('disciplines', this)">Disciplines</button>
+  </div>
+
+  <!-- CLANS PANEL -->
+  <div id="tab-clans" class="panel active">
+    <div class="table-wrap">
+      <table>
+        <thead>
+          <tr>
+            <th>Clan</th>
+            <th>Nickname</th>
+            <th colspan="3">Disciplines</th>
+          </tr>
+        </thead>
+        <tbody id="clan-tbody"></tbody>
+      </table>
+    </div>
+  </div>
+
+  <!-- DISCIPLINES PANEL -->
+  <div id="tab-disciplines" class="panel">
+    <div class="disc-lore">
+      Disciplines are the abilities that vampires gain after being taught their clan's ways through a Sire.
+      Disciplines use an amount of vitae, which will need to be replenished. Low vitae amounts can weaken vampires.
+    </div>
+    <div class="search-wrap">
+      <span class="search-icon">⚔</span>
+      <input class="search-input" type="text" placeholder="Search powers…" oninput="filterPowers(this.value)" />
+    </div>
+    <div id="disc-container"></div>
+  </div>
+
+  <footer>✦ &nbsp; @ph_nt0m &nbsp; ✦</footer>
+
+</div>
+
+<script>
+// =============================================
+//  DATA — Edit here to add/remove clans/powers
+// =============================================
+const CLANS = [
+  { name: "Malkavian",  nick: "Lunatics",    discs: ["Dementation","Auspex","Obfuscate"] },
+  { name: "Nosferatu",  nick: "Sewer Rats",  discs: ["Obfuscate","Animalism","Potence"] },
+  { name: "Toreador",   nick: "Degenerates", discs: ["Auspex","Celerity","Presence"] },
+  { name: "Tremere",    nick: "Warlocks",    discs: ["Auspex","Thaumaturgy","Dominate"] },
+  { name: "Ventrue",    nick: "Blue Bloods", discs: ["Presence","Dominate","Fortitude"] },
+  { name: "Banu Haqim", nick: "Assassins",   discs: ["Celerity","Thaumaturgy","Obfuscate"] },
+  { name: "Lasombra",   nick: "Magisters",   discs: ["Potence","Dominate","Oblivion"] },
+  { name: "Brujah",     nick: "Rebels",      discs: ["Potence","Celerity","Presence"] },
+];
+
+const DISCIPLINES = {
+  "Animalism": [
+    { level: "4-5",   name: "Drawing Out the Beast", desc: "Gather animalistic instincts from the people around you, singling it onto one person." },
+    { level: "8-9",   name: "Subsume the Spirit",    desc: "Possess an animal body fully, leaving your own behind. You see and act through the creature." },
+    { level: "8-9",   name: "Animal Dominion",       desc: "Issue commands to all animals in the area simultaneously, not just one." },
+    { level: "10-11", name: "Subjugate the Beast",   desc: "Suppress another vampire's Hunger frenzy entirely, calming them instantly." },
+    { level: "12-13", name: "Animal Succulence",     desc: "Feed from animals and gain full nourishment, not the usual reduced amount." },
+    { level: "14-15", name: "Bond Famulus",          desc: "Bind an animal as a permanent familiar. It follows commands and shares a rudimentary mental link." },
+    { level: "14-15", name: "Atavism",               desc: "Cause a target to briefly lose higher reasoning and act on pure animal instinct." },
+    { level: "16",    name: "Sense the Beast",       desc: "Detect the Hunger or Rage in mortals and vampires nearby. Useful for reading a room before entering." },
+    { level: "16",    name: "Feral Whispers",        desc: "Communicate mentally with animals. Issue simple commands; animals obey willingly." },
+  ],
+  "Auspex": [
+    { level: "8-9",   name: "Psychic Projection",         desc: "Fully project your consciousness as a spirit, traveling freely and invisibly." },
+    { level: "8-9",   name: "Telepathic Communication",   desc: "Establish a silent mental network across multiple willing participants simultaneously." },
+    { level: "10-11", name: "Scrying",                    desc: "Project your senses to a known location without moving your body. See and hear remotely." },
+    { level: "12-13", name: "Premonition",                desc: "Receive flashes of the future — vague, but enough to avoid ambushes or sense danger." },
+    { level: "12-13", name: "Telepathy",                  desc: "Read surface thoughts of a target. With effort, dig deeper into memories." },
+    { level: "12-13", name: "Unburdening the Soul",       desc: "Project calming psychic energy — reduce tension, suppress hostility in a scene." },
+    { level: "14-15", name: "Sense the Unseen",           desc: "Detect hidden vampires, spirits, or supernatural phenomena in the area." },
+    { level: "14-15", name: "Obeah's Touch",              desc: "Read emotional impressions and memories left on objects or places." },
+    { level: "16",    name: "Heightened Senses",          desc: "Amplify all physical senses to above vampiric levels." },
+  ],
+  "Celerity": [
+    { level: "8-9",   name: "Split Second",        desc: "Briefly exist slightly ahead of time — react to things that haven't happened yet." },
+    { level: "10-11", name: "Draught of Elegance", desc: "Grant Celerity benefits to a mortal temporarily by feeding them your blood." },
+    { level: "10-11", name: "Lightning Strike",    desc: "Strike so fast a single blow lands as multiple simultaneous attacks." },
+    { level: "12-13", name: "Traversal",           desc: "Run up walls and across ceilings at full speed without losing momentum." },
+    { level: "12-13", name: "Unerring Aim",        desc: "Supernatural speed makes all ranged attacks nearly impossible to dodge." },
+    { level: "14-15", name: "Fleetness",           desc: "Move faster than humanly possible — outpace vehicles over short distances." },
+    { level: "14-15", name: "Blink",               desc: "Cross short distances in an instant, appearing to teleport to witnesses." },
+    { level: "16",    name: "Cat's Grace",         desc: "Maintain perfect balance in any physical situation — never stumble, fall, or be knocked prone." },
+    { level: "16",    name: "Rapid Reflexes",      desc: "React to threats before consciously registering them." },
+  ],
+  "Dominate": [
+    { level: "4-5",   name: "Possession",          desc: "Completely take over a mortal body, suppressing their mind entirely." },
+    { level: "6-7",   name: "Terminal Decree",     desc: "Issue a command so deep it persists indefinitely until completed or undone." },
+    { level: "8-9",   name: "Mass Manipulation",   desc: "Extend Dominate commands to an entire crowd simultaneously." },
+    { level: "10-11", name: "Submerged Directive", desc: "Plant a command that activates only when a specific condition is met." },
+    { level: "12-13", name: "The Forgetful Mind",  desc: "Rewrite or entirely reconstruct a target's memories of a period of time." },
+    { level: "12-13", name: "Domitor's Favor",     desc: "Protect a blood-bound thrall from being Dominated by others." },
+    { level: "14-15", name: "Cloud Memory",        desc: "Erase a short, specific memory from a target's mind. Leaves a gap they rationalize away." },
+    { level: "14-15", name: "Compel",              desc: "Issue a single short command that the target obeys immediately and unconsciously." },
+    { level: "14-15", name: "Mesmerize",           desc: "Implant a detailed suggestion or instruction into a target's mind, triggered later." },
+  ],
+  "Fortitude": [
+    { level: "6-7",   name: "Undying Heart",            desc: "Survive staking, decapitation attempts, or other 'instant kill' conditions once per session." },
+    { level: "10-11", name: "Draught of Endurance",     desc: "Bestow Fortitude's physical protection to a mortal via blood." },
+    { level: "10-11", name: "Flesh of Marble",          desc: "Your flesh withstands attacks for multiple minutes." },
+    { level: "12-13", name: "Defy Bane",                desc: "Temporarily survive vampiric weaknesses (stakes, sunlight, etc.)" },
+    { level: "12-13", name: "Fortify the Inner Facade", desc: "Appear completely human to all supernatural detection for a scene." },
+    { level: "14-15", name: "Unswayable Mind",          desc: "Resist mental domination, emotional manipulation, and psychic intrusion." },
+    { level: "14-15", name: "Toughness",                desc: "Your flesh completely tanks an attack." },
+    { level: "14-15", name: "Enduring Beasts",          desc: "Resist terror, Presence-based powers, and fear-inducing supernatural effects." },
+    { level: "16",    name: "Resilience",               desc: "Your flesh resists damage." },
+  ],
+  "Obfuscate": [
+    { level: "8-9",   name: "Cloak the Gathering",     desc: "Render an entire group invisible simultaneously — useful for moving a coterie unseen." },
+    { level: "8-9",   name: "Phantom Whisper",         desc: "Project your voice or image to a distant location while your body remains elsewhere." },
+    { level: "10-11", name: "Mental Maze",             desc: "Trap a target in a disorienting illusion that makes them wander in circles." },
+    { level: "12-13", name: "Mask of a Thousand Faces", desc: "Appear as any generic human — not a specific person, but a convincing stranger." },
+    { level: "12-13", name: "Conceal",                 desc: "Extend your Obfuscate to hide an object, vehicle, or other person alongside you." },
+    { level: "14-15", name: "Unseen Passage",          desc: "Move while invisible — no longer need to remain still to maintain concealment." },
+    { level: "14-15", name: "Chimerstry",              desc: "Project small, simple illusions — sounds, smells, or brief visual flickers." },
+    { level: "14-15", name: "Ghost in the Machine",    desc: "Become invisible to electronic surveillance — cameras, sensors, and recordings miss you entirely." },
+    { level: "16",    name: "Cloak of Shadows",        desc: "Remain perfectly still and become invisible to casual observation — blend into any environment." },
+    { level: "16",    name: "Silence of Death",        desc: "Muffle all sounds you make, moving in complete silence." },
+  ],
+  "Oblivion": [
+    { level: "6-7",   name: "Void's Call",          desc: "Open a tear between the living world and the Shadowlands — ghosts flood through, chaos follows." },
+    { level: "8-9",   name: "Summon Shade",          desc: "Call a ghost or wraith from the Shadowlands and bind it to do your bidding temporarily." },
+    { level: "10-11", name: "Stygian Shroud",        desc: "Blanket an area in supernatural cold and darkness drawn from the Shadowlands." },
+    { level: "12-13", name: "Arms of the Abyss",     desc: "Summon shadowy tendrils from the void to grab, hold, or crush targets." },
+    { level: "12-13", name: "Touch of Oblivion",     desc: "You channel the power of Oblivion through direct, physical contact." },
+    { level: "14-15", name: "Where the Shroud Thins", desc: "See and hear into the Shadowlands (the realm of the dead) simultaneously with the living world." },
+    { level: "14-15", name: "Oblivion's Sight",      desc: "Perceive the true nature of ghosts, wraiths, and death-touched entities regardless of concealment." },
+    { level: "16",    name: "Ashes to Ashes",        desc: "Sense the presence of death, ghosts, and recently deceased nearby. A passive radar for the dead." },
+    { level: "16",    name: "Cloak of Shadows",      desc: "Draw on the void to dim perception around you — not full invisibility, but unsettling oversight." },
+  ],
+  "Potence": [
+    { level: "8-9",   name: "Spark of Rage",   desc: "Your presence alone triggers aggression in others — mortals become unsettled and hostile." },
+    { level: "10-11", name: "Draught of Might", desc: "Grant Potence's strength to a mortal temporarily via your blood." },
+    { level: "12-13", name: "Undead Strength",  desc: "Temporarily multiply your Potence further — brief burst of truly monstrous force." },
+    { level: "12-13", name: "Earthshock",       desc: "Strike the ground to release a shockwave — knocks down everyone in a radius." },
+    { level: "12-13", name: "Fist of Caine",    desc: "A single blow can shatter stone, destroy vehicles, or kill a mortal outright." },
+    { level: "14-15", name: "Prowess",          desc: "Lift, throw, or break objects far beyond human limits — cars, walls, vault doors." },
+    { level: "14-15", name: "Brutal Feed",      desc: "Rip blood from a victim so violently it deals damage even if they survive." },
+    { level: "16",    name: "Lethal Body",      desc: "Your unarmed strikes are stronger than those of other vampires." },
+    { level: "16",    name: "Soaring Leap",     desc: "Jump superhuman distances — cross rooms, scale buildings, clear obstacles in one bound." },
+  ],
+  "Presence": [
+    { level: "4-5",   name: "Star Magnetism",  desc: "Your Presence extends to anyone who has ever met you — summon or affect them from anywhere." },
+    { level: "8-9",   name: "Idol",            desc: "Become the center of a crowd's adoration — they follow, defend, and worship you." },
+    { level: "10-11", name: "Cooperation",     desc: "Force a group to work together peacefully, suppressing conflict and aggression." },
+    { level: "12-13", name: "Majesty",         desc: "Project overwhelming supernatural authority — no one can act against you without enormous effort." },
+    { level: "14-15", name: "Entrancement",    desc: "Make a target infatuated with you — they act to please you without being fully commanded." },
+    { level: "14-15", name: "Summon",          desc: "Call a person to your location from anywhere — they feel a compulsion to come to you." },
+    { level: "16",    name: "Awe",             desc: "Radiate supernatural attractiveness — people naturally want to please and agree with you." },
+    { level: "16",    name: "Daunt",           desc: "Radiate supernatural menace — people naturally want to flee or avoid confronting you." },
+  ],
+  "Dementation": [
+    { level: "4-5",   name: "Lunatic Eruption",  desc: "Unleash a wave of psychic madness affecting everyone in the area — mass derangement, mass frenzy." },
+    { level: "6-7",   name: "Confusion",         desc: "Flood an area with psychic noise — everyone nearby loses the thread of their own thoughts." },
+    { level: "8-9",   name: "Restructure",       desc: "Permanently rewrite a target's personality by replacing one derangement or trait with another." },
+    { level: "8-9",   name: "Shattered Mirror",  desc: "Reflect your own derangements into the target, forcing them to experience your madness." },
+    { level: "10-11", name: "Total Insanity",    desc: "Temporarily shatter a target's mind, inflicting multiple severe derangements at once." },
+    { level: "12-13", name: "Eyes of Chaos",     desc: "See the hidden patterns of madness in the world — read a target's deepest fears and fixations." },
+    { level: "12-13", name: "Voice of Madness",  desc: "Speak words that send mortals into blind panic or frenzy. Vampires resist but are shaken." },
+    { level: "14-15", name: "Passion",           desc: "Inflame a single emotion in the target — fear, rage, joy, sorrow — to overwhelming intensity." },
+    { level: "14-15", name: "The Haunting",      desc: "Cause the target to suffer vivid, disturbing hallucinations. They cannot tell what is real." },
+  ],
+  "Thaumaturgy": [
+    { level: "6-7",   name: "Bind the Accursed", desc: "Inscribe a binding ritual that constrains a supernatural being to rules or a location." },
+    { level: "8-9",   name: "Ward vs. Kindred",  desc: "Inscribe a sigil that inflicts burning damage to any vampire who crosses it." },
+    { level: "12-13", name: "Cauldron of Blood", desc: "Boil a target's blood inside their body — massively damaging and horrifying." },
+    { level: "12-13", name: "Baal's Caress",     desc: "Coat a weapon in your blood to make wounds that cannot be healed normally." },
+    { level: "14-15", name: "Theft of Vitae",    desc: "Rip blood from a target's body without physical contact, pulling it through the air." },
+    { level: "16",    name: "A Taste for Blood", desc: "Analyze a blood sample to learn clan, generation, and Hunger level of the source." },
+  ],
+};
+
+// =============================================
+//  HOW TO EDIT THIS FILE
+// =============================================
+//
+//  ADDING A CLAN:
+//  Find the CLANS array above and add a new object:
+//  { name: "Clan Name", nick: "Nickname", discs: ["Disc1","Disc2","Disc3"],
+//    bane: "Your bane text", comp: "Your compulsion text" },
+//  Make sure the discipline names match exactly what's in DISCIPLINES.
+//
+//  ADDING A DISCIPLINE:
+//  Find the DISCIPLINES object and add a new key:
+//  "Discipline Name": [
+//    { level: "•", name: "Power Name", desc: "Description." },
+//    ...
+//  ],
+//
+//  ADDING A POWER TO AN EXISTING DISCIPLINE:
+//  Find the discipline in DISCIPLINES and add a new line:
+//  { level: "••", name: "New Power", desc: "What it does." },
+//
+//  REMOVING ANYTHING:
+//  Delete the relevant line. Save the file. Done.
+// =============================================
+
+// ── RENDER CLANS ──
+function renderClans() {
+  const tbody = document.getElementById('clan-tbody');
+  tbody.innerHTML = CLANS.map(c => `
+    <tr>
+      <td><div class="clan-name">${c.name}</div></td>
+      <td><div class="clan-nick">${c.nick}</div></td>
+      ${c.discs.map(d => `<td><span class="disc-link" onclick="goToDisc('${d}')">${d}</span></td>`).join('')}
+    </tr>
+  `).join('');
+}
+
+// ── PASS-THROUGH (levels are now generation numbers) ──
+function toRoman(val) { return val; }
+
+// ── RENDER DISCIPLINES ──
+function renderDisciplines(filter = '') {
+  const container = document.getElementById('disc-container');
+  const fl = filter.toLowerCase();
+
+  container.innerHTML = Object.entries(DISCIPLINES).map(([name, powers]) => {
+    const filtered = fl
+      ? powers.filter(p => p.name.toLowerCase().includes(fl) || p.desc.toLowerCase().includes(fl) || name.toLowerCase().includes(fl))
+      : powers;
+    if (fl && filtered.length === 0) return '';
+
+    const powersHTML = filtered.map((p, i) => `
+      <div class="power-row">
+        <div class="power-level">${toRoman(p.level)}</div>
+        <div class="power-name">${p.name}</div>
+        <div class="power-desc">${p.desc}</div>
+      </div>
+    `).join('');
+
+    const isOpen = fl ? 'open' : '';
+    return `
+      <div class="disc-block ${isOpen}" id="disc-${name.replace(/\s+/g,'-')}">
+        <div class="disc-header" onclick="toggleDisc(this.parentElement)">
+          <span class="disc-header-name">⚔ &nbsp;${name}</span>
+          <span class="disc-header-right">
+            <span class="disc-count">${filtered.length} power${filtered.length !== 1 ? 's' : ''}</span>
+            <span class="disc-chevron">▾</span>
+          </span>
+        </div>
+        <div class="disc-body">
+          <div class="power-col-headers">
+            <div class="power-col-header">Gen.</div>
+            <div class="power-col-header">Name</div>
+            <div class="power-col-header">Description</div>
+          </div>
+          ${powersHTML}
+        </div>
+      </div>
+    `;
+  }).join('');
+}
+
+// ── TOGGLE DISCIPLINE BLOCK ──
+function toggleDisc(block) {
+  block.classList.toggle('open');
+}
+
+// ── NAVIGATE FROM CLAN TAB TO DISCIPLINE ──
+function goToDisc(discName) {
+  switchTab('disciplines', document.querySelectorAll('.tab')[1]);
+  setTimeout(() => {
+    const id = 'disc-' + discName.replace(/\s+/g, '-');
+    const block = document.getElementById(id);
+    if (!block) return;
+    block.classList.add('open');
+    block.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    block.classList.add('highlighted');
+    setTimeout(() => block.classList.remove('highlighted'), 1400);
+  }, 80);
+}
+
+// ── SWITCH TABS ──
+function switchTab(name, btn) {
+  document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+  document.querySelectorAll('.panel').forEach(p => p.classList.remove('active'));
+  btn.classList.add('active');
+  document.getElementById('tab-' + name).classList.add('active');
+}
+
+// ── SEARCH FILTER ──
+function filterPowers(val) {
+  renderDisciplines(val);
+}
+
+// ── INIT ──
+renderClans();
+renderDisciplines();
+</script>
+</body>
+</html>
